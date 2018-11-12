@@ -12,6 +12,7 @@ class CustomUserCreateView(generics.CreateAPIView):
 	queryset = models.CustomUser.objects.all()
 	permission_classes = (permissions.AllowAny, )
 
+
 class CustomUserRetrieveView(generics.RetrieveAPIView):
 	serializer_class = custom_serializers.CustomUserSerializer
 	queryset = models.CustomUser.objects.all()

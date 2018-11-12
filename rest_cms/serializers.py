@@ -18,8 +18,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
 	birthdate = serializers.DateField(required=False)
 	updated_at = serializers.DateTimeField(read_only=True)
 	created_at = serializers.DateTimeField(read_only=True)
+	password = serializers.CharField(write_only=True, required=True)
 	avatar = serializers.ImageField(use_url=True, max_length=255, required=False)
-	skills = SkillSerializer(many=True)
+	skills = SkillSerializer(many=True, read_only=True)
 	hometown = serializers.CharField(required=False)
 	phone_number = serializers.CharField(required=False)
 	facebook_id = serializers.CharField(required=False)
@@ -34,13 +35,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
 		fields = ('first_name', 'last_name', 'email', 'updated_at', 'created_at', \
 			'avatar', 'username', 'birthdate', 'avatar', 'skills', 'hometown', 'phone_number', \
 			'facebook_id', 'twitter_id', 'activities_and_interest', 'organization_team_clubs', 'privacy_setting', \
-			'is_staff', 'id', )
+			'is_staff', 'id', 'password', )
 
 	def create(self, validated_data):
 		password = validated_data.pop('password', None)
 		instance = self.Meta.model(**validated_data)
 		first_name = validated_data.pop('first_name', None)
-		username = first_name + "_" + uuid.uuid4()
+		username = first_name + "_" + str(uuid.uuid4())
 		instance.username = username
 		instance.set_password(password)
 		instance.save()
@@ -70,14 +71,35 @@ class ChallengeSerializer(serializers.ModelSerializer):
 	title = serializers.CharField(read_only=True)
 	id = serializers.IntegerField(read_only=True)
 	total_submission = serializers.SerializerMethodField()
+	next_challenge_id = serializers.SerializerMethodField(read_only=True)
+	next_challenge_title = serializers.SerializerMethodField(read_only=True)
 
 	def get_total_submission(self, obj):
 		return obj.submission_set.count()
 
+	def get_next_challenge_id(self, obj):
+		id = obj.id
+		challenge = Challenge.objects.filter(id__gt=id).first()
+		if challenge is not None:
+			return challenge.id
+		else:	
+			return -1
+
+	def get_next_challenge_title(self, obj):
+		id = obj.id
+		challenge = Challenge.objects.filter(id__gt=id).first()
+		if challenge is not None:
+			if len(challenge.title) > 25:
+				return challenge.title[0:25] + '...'
+			else:
+				return challenge.title
+		else:	
+			return None
+
 	class Meta:
 		model = Challenge
 		fields = ('id', 'created_at', 'updated_at', 'author', 'skills', 'price', 'due_date', 'description', 'deliverables', \
-			'status', 'is_anonymous_author', 'banner_image', 'title', 'total_submission', )
+			'status', 'is_anonymous_author', 'banner_image', 'title', 'total_submission', 'next_challenge_id', 'next_challenge_title', )
 
 
 class SubmissionWriteSerializer(serializers.ModelSerializer):
