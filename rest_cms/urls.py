@@ -26,7 +26,7 @@ urlpatterns = [
 	path(r'challenges/', rest_cms_views.ChallengeListView.as_view()),
 	path(r'challenges/<int:pk>/', rest_cms_views.ChallengeRetrieveView.as_view()),
 	path(r'auth-register/', rest_cms_views.CustomUserCreateView.as_view()),
-	path(r'users/<int:pk>/', rest_cms_views.CustomUserRetrieveView.as_view()),
+	path(r'users/<int:pk>/', rest_cms_views.CustomUserUpdateView.as_view()),
 	path(r'submissions/', rest_cms_views_submission_list_create),
 	path(r'submissions/<int:pk>/', rest_cms_views_submission_retrieve_update_destroy)
 ]

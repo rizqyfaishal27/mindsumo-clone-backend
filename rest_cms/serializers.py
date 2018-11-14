@@ -12,30 +12,39 @@ class SkillSerializer(serializers.ModelSerializer):
 		model = Skill
 		fields = ('skill_name', 'id', 'created_at', 'updated_at', 'is_primary', )
 
+class CustomUserSubmissionReadSerializer(serializers.ModelSerializer):
+	id = serializers.IntegerField(read_only=True)
+	challenge = serializers.PrimaryKeyRelatedField(read_only=True)
+
+	class Meta:
+		model = Submission
+		fields = ('challenge', 'id',)
+
 class CustomUserSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(read_only=True)
 	username = serializers.CharField(read_only=True)
-	birthdate = serializers.DateField(required=False)
+	birthdate = serializers.DateField(required=False, allow_null=True)
 	updated_at = serializers.DateTimeField(read_only=True)
 	created_at = serializers.DateTimeField(read_only=True)
 	password = serializers.CharField(write_only=True, required=True)
 	avatar = serializers.ImageField(use_url=True, max_length=255, required=False)
 	skills = SkillSerializer(many=True, read_only=True)
-	hometown = serializers.CharField(required=False)
-	phone_number = serializers.CharField(required=False)
+	hometown = serializers.CharField(required=False, allow_null=True)
+	phone_number = serializers.CharField(required=False, allow_null=True)
 	facebook_id = serializers.CharField(required=False)
-	twitter_id = serializers.CharField(required=False)
-	activities_and_interest = serializers.CharField(required=False)
-	organization_team_clubs = serializers.CharField(required=False)
+	twitter_id = serializers.CharField(required=False)	
+	activities_and_interest = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+	organization_team_clubs = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 	privacy_setting = serializers.IntegerField(required=False)
 	is_staff = serializers.BooleanField(read_only=True)
+	submissions = CustomUserSubmissionReadSerializer(many=True, read_only=True)
 
 	class Meta:	
 		model = CustomUser
 		fields = ('first_name', 'last_name', 'email', 'updated_at', 'created_at', \
 			'avatar', 'username', 'birthdate', 'avatar', 'skills', 'hometown', 'phone_number', \
 			'facebook_id', 'twitter_id', 'activities_and_interest', 'organization_team_clubs', 'privacy_setting', \
-			'is_staff', 'id', 'password', )
+			'is_staff', 'id', 'password', 'submissions', )
 
 	def create(self, validated_data):
 		password = validated_data.pop('password', None)
@@ -65,7 +74,7 @@ class ChallengeSerializer(serializers.ModelSerializer):
 	due_date = serializers.DateField(read_only=True)
 	description = serializers.CharField(read_only=True)
 	deliverables = serializers.CharField(read_only=True)
-	status = serializers.BooleanField(read_only=True)
+	status = serializers.IntegerField(read_only=True)
 	is_anonymous_author = serializers.BooleanField(read_only=True)
 	banner_image = serializers.ImageField(use_url=True, read_only=True)
 	title = serializers.CharField(read_only=True)
@@ -103,6 +112,7 @@ class ChallengeSerializer(serializers.ModelSerializer):
 
 
 class SubmissionWriteSerializer(serializers.ModelSerializer):
+	id = serializers.IntegerField(read_only=True)
 	challenge = serializers.PrimaryKeyRelatedField(required=True, queryset=Challenge.objects.all())
 	submission_title = serializers.CharField(min_length=10, max_length=100, required=True)
 	submission_text = serializers.CharField(required=True)
@@ -112,8 +122,8 @@ class SubmissionWriteSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Submission
-		fields = ('created_at', 'updated_at', 'challenge', 'submission_user', 'submission_title', \
-			'submission_text', 'submission_file', )
+		fields = ('created_at', 'updated_at', 'challenge', 'submission_title', \
+			'submission_text', 'submission_file', 'id', )
 
 
 class SubmissionReadSerializer(serializers.ModelSerializer):

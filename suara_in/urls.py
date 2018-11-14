@@ -21,7 +21,7 @@ from rest_cms.admin import admin_site
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('cms-admin/', admin_site.urls),
+    path('', admin_site.urls),
     path('api/v1/', include('rest_cms.urls')),
     path('tinymce/', include('tinymce.urls')),
     # path('accounts/', include('allauth.urls')),

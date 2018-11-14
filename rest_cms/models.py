@@ -83,7 +83,7 @@ class Challenge(models.Model):
 
 class Submission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
-    submission_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    submission_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='submissions')
     submission_title = models.CharField(max_length=100)
     submission_text = HTMLField()
     submission_file = models.FileField(upload_to="files/", null=True)

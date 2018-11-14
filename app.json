@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dokku": {
+      "postdeploy": "./manage.py migrate"
+    },
+    "postdeploy": "python manage.py migrate && python manage.py populate-skills && python manage.py runcrons"
+  }
+}
